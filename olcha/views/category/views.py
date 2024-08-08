@@ -1,52 +1,6 @@
-#
-# from rest_framework.permissions import AllowAny
-# from rest_framework.response import Response
-# from rest_framework.views import APIView
-# from olcha.serializers import CategoryModelSerializer
-# from olcha.models import Category
-# from rest_framework import serializers, status
-#
-#
-# class CategoryView(APIView):
-#     permission_classes = (AllowAny,)
-#
-#     def get(self, request):
-#         categories = Category.objects.all()
-#         category_list = [
-#             {'category_title': category.category_title,
-#              'category_id': category.id,
-#              'category_image': request.build_absolute_uri(category.category_image.url),
-#              }
-#             for category in categories]
-#         return Response(data=category_list)
-#
-#
-# class CategoryDetailView(APIView):
-#     permission_classes = (AllowAny,)
-#
-#     def get(self, request, id):
-#         category = Category.objects.get(pk=id)
-#         category_list = [
-#             {'category_title': category.category_title,
-#              'category_id': category.id,
-#              'category_image': request.build_absolute_uri(category.category_image.url),
-#              }
-#         ]
-#         return Response(data=category_list)
-#
-#
-# class CategoryCreateView(APIView):
-#     permission_classes = (AllowAny,)
-#
-#     def post(self, request):
-#         serializer=CategoryModelSerializer(data=request.data)
-#         if serializer.is_valid():
-#             serializer.save()
-#             return Response(serializer.data, status=status.HTTP_201_CREATED)
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 #
 from django.shortcuts import get_object_or_404
-from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import generics, status
 from olcha.models import Category, Product
@@ -127,3 +81,4 @@ class DeleteCategoryView(generics.DestroyAPIView):
         category = get_object_or_404(Category, slug=slug)
         category.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+

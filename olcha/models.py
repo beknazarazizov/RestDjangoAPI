@@ -1,46 +1,6 @@
-
+from django.contrib.auth.models import User
 from django.db import models
 from django.utils.text import slugify
-
-# Create your models here.
-"""category, group, Image, Product, Comment, Atribute, key ,value
-1. Categories
-
-http://127.0.0.1:8000/olcha-uz/category
-
-    - category_title,
-    - category_slug,
-    - category_image
-2.Group
-
-http://127.0.0.1:8000/olcha-uz/category/category_slug/
-
-    - group_name
-    - group_image
-    - category_slug
-
-3.Products
-
-http://127.0.0.1.8000/olcha-uz/products
-
-name
-description
-price
-discount
-image
-slug
-is_liked
-comment_count
-avg_rating
-attributes = {
-
-    key:value
-}
-primary_image 
-image_list
-
-
-"""
 
 
 class BaseModel(models.Model):
@@ -105,7 +65,8 @@ class Product(BaseModel):
 class Comment(BaseModel):
     comment = models.TextField()
     slug = models.SlugField(max_length=500,unique=True,blank=True)
-    product_id = models.ForeignKey(Product,on_delete=models.CASCADE)
+    product_id = models.ForeignKey(Product,on_delete=models.CASCADE,related_name='comments')
+    user=models.ForeignKey(User,on_delete=models.CASCADE,related_name='comments')
 
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -116,20 +77,20 @@ class Comment(BaseModel):
 class Atribute(BaseModel):
     key_name = models.CharField(max_length=500,unique=True)
     value_name = models.TextField()
-    atribute_slug = models.SlugField(max_length=500,unique=True,blank=True)
-    product_id = models.ForeignKey(Product,on_delete=models.CASCADE)
+    slug = models.SlugField(max_length=500,unique=True,blank=True)
+    product = models.ForeignKey(Product,on_delete=models.CASCADE,related_name='attributes')
 
     def save(self, *args, **kwargs):
-        if not self.atribute_slug:
-            self.atribute_slug = slugify(self.key)
+        if not self.slug:
+            self.slug = slugify(self.key_name)
         super(Atribute, self).save(*args, **kwargs)
 
 
 
 class Key(BaseModel):
     key_name = models.CharField(max_length=500,unique=True)
-    slug = models.SlugField(max_length=500,unique=True,blank=True)
-    atribute_id = models.ForeignKey(Atribute,on_delete=models.CASCADE)
+    slug = models.SlugField(max_length=500,unique=True,blank=True,null=False)
+    atribute = models.ForeignKey(Atribute,on_delete=models.CASCADE,related_name='keys')
 
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -139,8 +100,8 @@ class Key(BaseModel):
 
 class Value(BaseModel):
     value_name = models.CharField(max_length=500,unique=True)
-    slug = models.SlugField(max_length=500,unique=True,blank=True)
-    atribute_id = models.ForeignKey(Atribute,on_delete=models.CASCADE)
+    slug = models.SlugField(max_length=500,unique=True,blank=True,null=False)
+    atribute = models.ForeignKey(Atribute,on_delete=models.CASCADE,related_name='values')
 
 
 
