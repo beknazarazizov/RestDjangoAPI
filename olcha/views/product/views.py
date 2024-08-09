@@ -41,6 +41,7 @@ class ProductUpdateView(APIView):
 
 
 class ProductDeleteView(APIView):
+
     def delete(self, request, slug):
         product = Product.objects.get(slug=slug)
         product.delete()

@@ -1,3 +1,5 @@
+from typing import Any
+
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils.text import slugify
@@ -53,10 +55,17 @@ class Product(BaseModel):
     primary_image = models.ImageField(upload_to='images/')
     image_list = models.FileField(upload_to='images/')
 
+    @property
+    def discounted_price(self) -> Any:
+        if self.discount > 0:
+            return self.price * (1 - (self.discount / 100.0))
+        return self.price
+
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.name)
         super(Product, self).save(*args, **kwargs)
+
 
     def __str__(self):
         return self.name
