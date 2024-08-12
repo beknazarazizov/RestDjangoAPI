@@ -4,6 +4,7 @@ from django.urls import path, include
 from olcha.views.category.views import CategoryListView, CategoryDetail,CreateCategoryView,UpdateCategoryView,DeleteCategoryView
 from olcha.views.group.views import GroupApiView, GroupCreateApiView, GroupUpdateApiView, GroupDeleteApiView, \
     GroupDetailApiView
+from olcha.views.product.views import ProductListView, ProductDetail, ProductAttribute, ProductsAttribute
 
 urlpatterns = [
     path('category_list/',CategoryListView.as_view(),name='category_list'),
@@ -19,6 +20,11 @@ urlpatterns = [
     path('group/<int:pk>/delete/',GroupDeleteApiView.as_view(),name='group/delete'),
     path('group/<int:pk>/detail/',GroupDetailApiView.as_view(),name='group/detail'),
     #product
+    path('categories/<slug:category_slug>/<slug:group_slug>/', ProductListView.as_view()),
+    path('categories/<slug:category_slug>/<slug:group_slug>/<slug:product_slug>/', ProductDetail.as_view()),
+    path('categories/<slug:category_slug>/<slug:group_slug>/<slug:product_slug>/attribute/',
+         ProductAttribute.as_view()),
+    path('categories/<slug:category_slug>/<slug:group_slug>/products/attributes/', ProductsAttribute.as_view()),
 
 
 ]

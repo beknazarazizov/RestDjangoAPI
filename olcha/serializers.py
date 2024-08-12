@@ -2,7 +2,7 @@ from django.db.models import Avg
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 
-from olcha.models import Category, Group, Product
+from olcha.models import Category, Group, Product, Atribute
 
 
 class CategoryImageSerializer(serializers.ModelSerializer):
@@ -61,3 +61,23 @@ class ProductSerializer(ModelSerializer):
         model = Product
         fields = ['id', 'name', 'price', 'discount', 'discounted_price', 'is_liked', 'avg_rating', 'image']
 
+
+class ProductDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = '__all__'
+
+
+class AttributeSerializer(serializers.ModelSerializer):
+    attributes = serializers.SerializerMethodField()
+
+    def get_attributes(self, products):
+        attributes = Atribute.objects.filter(product=products.id)
+        attributes_dict = {}
+        for attribute in attributes:
+            attributes_dict[attribute.key.name] = attribute.value.name
+        return attributes_dict
+
+    class Meta:
+        model = Product
+        fields = ['id', 'name', 'slug', 'attributes']
