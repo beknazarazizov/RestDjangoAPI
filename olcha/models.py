@@ -39,6 +39,9 @@ class Group(BaseModel):
             self.slug = slugify(self.group_name)
         super(Group, self).save(*args, **kwargs)
 
+    def __str__(self):
+        return self.group_name
+
 
 class Product(BaseModel):
     name = models.CharField(max_length=500,unique=True)
@@ -46,14 +49,9 @@ class Product(BaseModel):
     description = models.TextField()
     price = models.IntegerField()
     discount = models.IntegerField(default=0)
+    group = models.ForeignKey(Group,on_delete=models.CASCADE,related_name='products')
     is_liked = models.BooleanField(default=False)
-    comment_count = models.IntegerField(default=0)
-    average_rating = models.FloatField(default=0)
-    attributes = {
-        'key':'value'
-    }
-    primary_image = models.ImageField(upload_to='images/')
-    image_list = models.FileField(upload_to='images/')
+
 
     @property
     def discounted_price(self) -> Any:
@@ -71,6 +69,12 @@ class Product(BaseModel):
         return self.name
 
 
+class Image(models.Model):
+    image = models.ImageField(upload_to='images/')
+    is_primary = models.BooleanField(default=False)
+    product=models.ForeignKey(Product,on_delete=models.CASCADE,related_name='images')
+
+
 class Comment(BaseModel):
     comment = models.TextField()
     slug = models.SlugField(max_length=500,unique=True,blank=True)
@@ -83,9 +87,23 @@ class Comment(BaseModel):
         super(Comment, self).save(*args, **kwargs)
 
 
-class Atribute(BaseModel):
+class Key(BaseModel):
     key_name = models.CharField(max_length=500,unique=True)
-    value_name = models.TextField()
+
+    def __str__(self):
+        return self.key_name
+
+
+class Value(BaseModel):
+    value_name = models.CharField(max_length=500,unique=True)
+
+    def __str__(self):
+        return self.value_name
+
+
+class Atribute(BaseModel):
+    key_name = models.ForeignKey(Key,on_delete=models.CASCADE)
+    value_name = models.ForeignKey(Value,on_delete=models.CASCADE)
     slug = models.SlugField(max_length=500,unique=True,blank=True)
     product = models.ForeignKey(Product,on_delete=models.CASCADE,related_name='attributes')
 
@@ -93,27 +111,6 @@ class Atribute(BaseModel):
         if not self.slug:
             self.slug = slugify(self.key_name)
         super(Atribute, self).save(*args, **kwargs)
-
-
-
-class Key(BaseModel):
-    key_name = models.CharField(max_length=500,unique=True)
-    slug = models.SlugField(max_length=500,unique=True,blank=True,null=False)
-    atribute = models.ForeignKey(Atribute,on_delete=models.CASCADE,related_name='keys')
-
-    def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = slugify(self.key_name)
-        super(Key,self).save(*args, **kwargs)
-
-
-class Value(BaseModel):
-    value_name = models.CharField(max_length=500,unique=True)
-    slug = models.SlugField(max_length=500,unique=True,blank=True,null=False)
-    atribute = models.ForeignKey(Atribute,on_delete=models.CASCADE,related_name='values')
-
-
-
 
 
 

@@ -102,7 +102,6 @@ class ProductAttribute(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-
 class LoginView(APIView):
     def post(self, request, *args, **kwargs):
         serializer = LoginSerializer(data=request.data)

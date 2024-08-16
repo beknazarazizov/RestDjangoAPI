@@ -9,7 +9,7 @@ from olcha.views.product.views import ProductListView, ProductDetail, ProductAtt
 
 urlpatterns = [
     path('category_list/',CategoryListView.as_view(),name='category_list'),
-    path('category/<slug:slug>detail/',CategoryDetail.as_view(),name='category_detail'),
+    path('category/<slug:slug>/detail/',CategoryDetail.as_view(),name='category_detail'),
     path('category_create/',CreateCategoryView.as_view(),name='category_create'),
     path('category<slug:slug>/update /', UpdateCategoryView.as_view(),name='category_update'),
     path('category/<slug:slug>/delete/', DeleteCategoryView.as_view(), name='category_delete'),
