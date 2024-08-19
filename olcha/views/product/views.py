@@ -6,13 +6,14 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
+from olcha.permissions import IsOwnerIsAuthenticated
 from olcha.models import Product
 from olcha.serializers import ProductSerializer, ProductDetailSerializer, AttributeSerializer, LoginSerializer, \
     RegisterSerializer
 
 
 class ProductListView(APIView):
+    permission_classes = (IsAuthenticated,)
 
     def get(self, request):
         products = Product.objects.all()
@@ -55,6 +56,7 @@ class ProductDeleteView(APIView):
 
 
 class ProductDetail(APIView):
+    permission_classes = IsOwnerIsAuthenticated
     def get(self, request, category_slug, group_slug, product_slug):
         product = get_object_or_404(Product, slug=product_slug)
         serializer = ProductDetailSerializer(product)

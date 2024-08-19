@@ -24,6 +24,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),
     path('olcha_uz/',include('olcha.urls')),
+    # path('post/', include('post.urls')),
     path('api-auth/', include('rest_framework.urls')),
     path('api-token-auth/', token.CustomTokenAuth.as_view()),
     path('api/token/', MyTokenObtainPairView.as_view()),
