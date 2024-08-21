@@ -32,7 +32,7 @@ class Group(BaseModel):
     group_name = models.CharField(max_length=500,unique=True)
     slug = models.SlugField(max_length=500,unique=True,blank=True)
     group_image = models.ImageField(upload_to='images/')
-    category_id = models.ForeignKey(Category,on_delete=models.CASCADE,related_name='categories')
+    category_id = models.ForeignKey(Category,on_delete=models.CASCADE,related_name='groups')
 
     def save(self, *args, **kwargs):
         if not self.slug:

@@ -6,26 +6,50 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework_simplejwt.authentication import JWTAuthentication
+
+from olcha import permissions
 from olcha.permissions import IsOwnerIsAuthenticated
 from olcha.models import Product
 from olcha.serializers import ProductSerializer, ProductDetailSerializer, AttributeSerializer, LoginSerializer, \
     RegisterSerializer
 
 
-class ProductListView(APIView):
-    permission_classes = (IsAuthenticated,)
+# class ProductListView(APIView):
+#     permission_classes = (IsAuthenticated,)
+#
+#     def get(self, request):
+#         products = Product.objects.all()
+#         serializer = ProductSerializer(products, many=True)
+#         return Response(data=serializer.data,status=status.HTTP_200_OK)
 
-    def get(self, request):
-        products = Product.objects.all()
-        serializer = ProductSerializer(products, many=True)
-        return Response(data=serializer.data,status=status.HTTP_200_OK)
+class ProductListView(generics.ListCreateAPIView):
+
+    serializer_class = ProductSerializer
+    lookup_field = 'slug'
+
+    def get_queryset(self):
+        category_slug = self.kwargs.get('category_slug')
+        group_slug = self.kwargs.get('group_slug')
+
+        queryset = Product.objects.select_related('group__category')
+
+        if category_slug and group_slug:
+            queryset = queryset.filter(group__category__slug=category_slug, group__slug=group_slug)
+        elif category_slug:
+            queryset = queryset.filter(category__slug=category_slug)
+        elif group_slug:
+            queryset = queryset.filter(group__slug=group_slug)
+
+        return queryset
 
 
-class ProductDetailView(APIView):
-    def get_object(self, slug):
-        product = Product.objects.get(slug=slug)
-        serializer = ProductSerializer(product,many=False)
-        return Response(data=serializer.data,status=status.HTTP_200_OK)
+
+# class ProductDetailView(APIView):
+#     def get_object(self, slug):
+#         product = Product.objects.get(slug=slug)
+#         serializer = ProductSerializer(product,many=False)
+#         return Response(data=serializer.data,status=status.HTTP_200_OK)
 
 
 class ProductCreateView(APIView):
@@ -47,13 +71,13 @@ class ProductUpdateView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class ProductDeleteView(APIView):
-
-    def delete(self, request, slug):
-        product = Product.objects.get(slug=slug)
-        product.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
+# class ProductDeleteView(APIView):
+#
+#     def delete(self, request, slug):
+#         product = Product.objects.get(slug=slug)
+#         product.delete()
+#         return Response(status=status.HTTP_204_NO_CONTENT)
+#
 
 class ProductDetail(APIView):
     permission_classes = IsOwnerIsAuthenticated
@@ -76,33 +100,39 @@ class ProductDetail(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class ProductsAttribute(APIView):
-    def get(self, request, category_slug, group_slug):
-        products = Product.objects.filter(group__category__slug=category_slug, group__slug=group_slug)
-        serializer = AttributeSerializer(products, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+# class ProductsAttribute(APIView):
+#     def get(self, request, category_slug, group_slug):
+#         products = Product.objects.filter(group__category__slug=category_slug, group__slug=group_slug)
+#         serializer = AttributeSerializer(products, many=True)
+#         return Response(serializer.data, status=status.HTTP_200_OK)
+
+class ProductAttribute(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Product.objects.select_related('group').prefetch_related('attributes__key', 'attributes__value')
+
+    serializer_class = AttributeSerializer
+    lookup_field = 'slug'
 
 
-class ProductAttribute(APIView):
-
-    def get(self, request, category_slug, group_slug, product_slug):
-        product = Product.objects.get(slug=product_slug)
-        serializer = AttributeSerializer(product)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    def post(self, request, category_slug, group_slug, product_slug):
-        product = Product.objects.get(slug=product_slug)
-        serializer = AttributeSerializer(product, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def delete(self, request, category_slug, group_slug, product_slug):
-        product = Product.objects.get(slug=product_slug)
-        product.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
+# class ProductAttribute(APIView):
+#
+#     def get(self, request, category_slug, group_slug, product_slug):
+#         product = Product.objects.get(slug=product_slug)
+#         serializer = AttributeSerializer(product)
+#         return Response(serializer.data, status=status.HTTP_200_OK)
+#
+#     def post(self, request, category_slug, group_slug, product_slug):
+#         product = Product.objects.get(slug=product_slug)
+#         serializer = AttributeSerializer(product, data=request.data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(serializer.data, status=status.HTTP_201_CREATED)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+#
+#     def delete(self, request, category_slug, group_slug, product_slug):
+#         product = Product.objects.get(slug=product_slug)
+#         product.delete()
+#         return Response(status=status.HTTP_204_NO_CONTENT)
+#
 
 class LoginView(APIView):
     def post(self, request, *args, **kwargs):

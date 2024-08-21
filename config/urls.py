@@ -14,6 +14,7 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from debug_toolbar.toolbar import debug_toolbar_urls
 from django.contrib import admin
 from config import token
 from django.urls import path, include
@@ -23,7 +24,7 @@ from config.token import  LogoutView, MyTokenObtainPairView
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),
-    path('olcha_uz/',include('olcha.urls')),
+    path('',include('olcha.urls')),
     # path('post/', include('post.urls')),
     path('api-auth/', include('rest_framework.urls')),
     path('api-token-auth/', token.CustomTokenAuth.as_view()),
@@ -32,6 +33,8 @@ urlpatterns = [
     path('api/token/verify/', TokenVerifyView.as_view()),
     path('api/token/blacklist/', TokenBlacklistView.as_view()),
     path('api-logout/', LogoutView.as_view()),
+    path('post/', include('post.urls')),
 
-]
+] + debug_toolbar_urls()
+
 
