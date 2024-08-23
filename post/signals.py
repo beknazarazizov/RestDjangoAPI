@@ -7,7 +7,7 @@ from rest_framework.authtoken.models import Token
 from post.models import Post
 
 
-
+#njdkdlf
 
 @receiver(pre_save, sender=Post)
 @receiver(post_save, sender=Post)
