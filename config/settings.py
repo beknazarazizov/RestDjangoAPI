@@ -199,3 +199,11 @@ INTERNAL_IPS = [
     "127.0.0.1",
     # ...
 ]
+
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.memcached.PyMemcacheCache",
+        "LOCATION": "C:/Users/Desktop/examsex/django_Rest/cache",
+    }
+}
